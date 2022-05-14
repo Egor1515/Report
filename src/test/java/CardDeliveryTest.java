@@ -27,28 +27,31 @@ public class CardDeliveryTest {
 
     }
 
+
     @Test
     void shouldSendFormV1() {
+        var info = DataGenerator.Registration.generateInfo("ru");
         Configuration.holdBrowserOpen = true;
-        var daysToAddForFirstMeeting = 4;
-        var daysToAddForSecondMeeting = 5;
-        open("http://localhost:7777/");
-        $("[data-test-id ='city'] input").val(DataGenerator.Registration.generateInfo("ru").getCity());
-        $("[data-test-id ='date'] input").sendKeys(Keys.chord(Keys.COMMAND, "A"));
-        $("[data-test-id ='date'] input").sendKeys(BACK_SPACE);
-        $("[data-test-id ='date'] input").val(DataGenerator.Registration.generateDate(daysToAddForFirstMeeting));
-        $("[data-test-id ='name'] input").val(DataGenerator.Registration.generateInfo("ru").getName());
-        $("[data-test-id ='phone'] input").val(DataGenerator.Registration.generateInfo("ru").getPhone());
+        Configuration.browserSize = "980x900";
+        var daysToAddForFirstMeeting = DataGenerator.Registration.generateDate(4);
+        var daysToAddForSecondMeeting = DataGenerator.Registration.generateDate(5);
+        open("http://localhost:9999/");
+        $x("//input[@placeholder = 'Город']").val(info.getCity());
+        $x("//input[@placeholder ='Дата встречи']").doubleClick();
+        $x("//input[@placeholder ='Дата встречи']").sendKeys(Keys.BACK_SPACE);
+        $x("//input[@placeholder ='Дата встречи']").val(daysToAddForFirstMeeting);
+        $x("//input[@name= 'name']").val(info.getName());
+        $x("//input[@name= 'phone']").val(info.getPhone());
         $(".checkbox__box").click();
         $(".button[role='button']").click();
-        $("[data-test-id='success-notification']").should(Condition.visible);
-        $("[data-test-id ='date'] input").sendKeys(Keys.chord(Keys.COMMAND, "A"));
-        $("[data-test-id ='date'] input").sendKeys(BACK_SPACE);
-        $("[data-test-id ='date'] input").val(DataGenerator.Registration.generateDate(daysToAddForSecondMeeting));
+        $("[data-test-id='success-notification']").should(Condition.visible, Condition.text("Успешно"),Condition.text("Встреча успешно запланирована на " + daysToAddForFirstMeeting));
+        $x("//input[@placeholder ='Дата встречи']").doubleClick();
+        $x("//input[@placeholder ='Дата встречи']").sendKeys(Keys.BACK_SPACE);
+        $x("//input[@placeholder ='Дата встречи']").val(daysToAddForSecondMeeting);
         $(".button[role='button']").click();
-        $("[data-test-id='replan-notification']").click();
+        $("[class ='button button_view_extra button_size_s button_theme_alfa-on-white']").click();
+        $("[data-test-id='success-notification']").should(Condition.visible,Condition.text("Встреча успешно запланирована на " + daysToAddForSecondMeeting));
 
 
     }
-
 }
